@@ -1,0 +1,2 @@
+https\://www.springframework.org/schema/spring-user.xsd=org/springframework/beans/mytest/user.xsd
+http\://www.springframework.org/schema/spring-user.xsd=org/springframework/beans/mytest/user.xsd

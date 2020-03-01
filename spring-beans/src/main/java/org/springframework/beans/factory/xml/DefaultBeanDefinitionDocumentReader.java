@@ -129,6 +129,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		this.delegate = createDelegate(getReaderContext(), root, parent);
 
 		if (this.delegate.isDefaultNamespace(root)) {
+			// 处理 profile 属性
 			String profileSpec = root.getAttribute(PROFILE_ATTRIBUTE);
 			if (StringUtils.hasText(profileSpec)) {
 				String[] specifiedProfiles = StringUtils.tokenizeToStringArray(
@@ -144,9 +145,13 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 				}
 			}
 		}
-
+		// 前置处理 空实现
 		preProcessXml(root);
+
+		// 解析
 		parseBeanDefinitions(root, this.delegate);
+
+		// 后置处理 空实现
 		postProcessXml(root);
 
 		this.delegate = parent;
@@ -167,15 +172,27 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	 */
 	protected void parseBeanDefinitions(Element root, BeanDefinitionParserDelegate delegate) {
 		if (delegate.isDefaultNamespace(root)) {
+			// 遍历 root 元素，即 beans
 			NodeList nl = root.getChildNodes();
 			for (int i = 0; i < nl.getLength(); i++) {
 				Node node = nl.item(i);
 				if (node instanceof Element) {
 					Element ele = (Element) node;
 					if (delegate.isDefaultNamespace(ele)) {
+
+						// 解析默认标签 import，alias，bean，beans
 						parseDefaultElement(ele, delegate);
 					}
 					else {
+
+						// 解析自定义标签，命名空间都属于自定义标签
+						/* 自定义标签的使用
+						 * 1. 编写一个扩展的组件
+						 * 2. 定义一个 XSD 文件并配置在 META-INF/spring.schemas 中
+						 * 3. 创建一个解析器，实现 AbstractSingleBeanDefinitionParser 接口
+						 * 4. 创建一个 Handler 继承 NamespaceHandlerSupport 用来注册解析器
+						 * 5。 将 Handler 配置在 META-INF/spring.handlers 中
+						 */
 						delegate.parseCustomElement(ele);
 					}
 				}
@@ -194,6 +211,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 			processAliasRegistration(ele);
 		}
 		else if (delegate.nodeNameEquals(ele, BEAN_ELEMENT)) {
+			// 解析 bean 标签
 			processBeanDefinition(ele, delegate);
 		}
 		else if (delegate.nodeNameEquals(ele, NESTED_BEANS_ELEMENT)) {
@@ -303,10 +321,15 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	 * and registering it with the registry.
 	 */
 	protected void processBeanDefinition(Element ele, BeanDefinitionParserDelegate delegate) {
+		// BeanDefinitionHolder 包含 beanDefinition，beanName和aliases 三个属性
+		// 到这里，beanDefinition 已经解析完毕
 		BeanDefinitionHolder bdHolder = delegate.parseBeanDefinitionElement(ele);
 		if (bdHolder != null) {
+			// bean 标签的子节点下还有 自定义标签
 			bdHolder = delegate.decorateBeanDefinitionIfRequired(ele, bdHolder);
 			try {
+
+				// 注册 BeanDefinition，使用 beanName 和别名注册
 				// Register the final decorated instance.
 				BeanDefinitionReaderUtils.registerBeanDefinition(bdHolder, getReaderContext().getRegistry());
 			}

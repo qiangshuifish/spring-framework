@@ -412,15 +412,18 @@ public class BeanDefinitionParserDelegate {
 	 */
 	@Nullable
 	public BeanDefinitionHolder parseBeanDefinitionElement(Element ele, @Nullable BeanDefinition containingBean) {
+		// 获取 id 属性
 		String id = ele.getAttribute(ID_ATTRIBUTE);
+		// 获取 name 属性，name 属性会被添加到 aliases 的第一位置
 		String nameAttr = ele.getAttribute(NAME_ATTRIBUTE);
-
+		// 别名处理 支持三种分隔符号  ',' ';' ' '
 		List<String> aliases = new ArrayList<>();
 		if (StringUtils.hasLength(nameAttr)) {
 			String[] nameArr = StringUtils.tokenizeToStringArray(nameAttr, MULTI_VALUE_ATTRIBUTE_DELIMITERS);
 			aliases.addAll(Arrays.asList(nameArr));
 		}
 
+		// beanName 取 id ，如果没有定义id 且 别名不为空时，beanName 取别名第一个
 		String beanName = id;
 		if (!StringUtils.hasText(beanName) && !aliases.isEmpty()) {
 			beanName = aliases.remove(0);
@@ -430,9 +433,11 @@ public class BeanDefinitionParserDelegate {
 			}
 		}
 
+		// 检测 别名，beanName 是否唯一
 		if (containingBean == null) {
 			checkNameUniqueness(beanName, aliases, ele);
 		}
+
 
 		AbstractBeanDefinition beanDefinition = parseBeanDefinitionElement(ele, beanName, containingBean);
 		if (beanDefinition != null) {
@@ -517,11 +522,28 @@ public class BeanDefinitionParserDelegate {
 			parseBeanDefinitionAttributes(ele, beanName, containingBean, bd);
 			bd.setDescription(DomUtils.getChildElementValueByTagName(ele, DESCRIPTION_ELEMENT));
 
+			// Meta 属性 通过 BeanDefinition.getAttribute()获取
+			// 此属性并不会存在于 class 中
 			parseMetaElements(ele, bd);
+
+			// 使用 GetBeanTest.getBean 返回的值给 student
+			//<bean id="getBeanTest" class="test.GetBeanTest">
+			//	<lookup-method name="getBean" bean="student"></lookup-method>
+			//</bean>
+			//<bean id="student" class="test.Student"/>
 			parseLookupOverrideSubElements(ele, bd.getMethodOverrides());
+
+
+			/*	使用 TestMethodReplacer.reimplement 代替 TestChangeMethod.changeMe
+			TestMethodReplacer 需要实现 MethodReplacer 接口
+			<bean id="testChangeMethod" class="test.TestChangeMethod">
+				<replaced-method name="changeMe" replacer="replacer"></replaced-method>
+			</bean>
+			<bean id="replacer" class="test.TestMethodReplacer"/>*/
 			parseReplacedMethodSubElements(ele, bd.getMethodOverrides());
 
 			parseConstructorArgElements(ele, bd);
+			// 解析子属性标签 list,map,array,set 等等
 			parsePropertyElements(ele, bd);
 			parseQualifierElements(ele, bd);
 
@@ -1413,6 +1435,7 @@ public class BeanDefinitionParserDelegate {
 
 		BeanDefinitionHolder finalDefinition = originalDef;
 
+		//
 		// Decorate based on custom attributes first.
 		NamedNodeMap attributes = ele.getAttributes();
 		for (int i = 0; i < attributes.getLength(); i++) {
@@ -1420,6 +1443,7 @@ public class BeanDefinitionParserDelegate {
 			finalDefinition = decorateIfRequired(node, finalDefinition, containingBd);
 		}
 
+		// bean 标签下有子元素时
 		// Decorate based on custom nested elements.
 		NodeList children = ele.getChildNodes();
 		for (int i = 0; i < children.getLength(); i++) {

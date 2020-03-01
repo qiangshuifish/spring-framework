@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:user="http://www.springframework.org/schema/user"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+                       https://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                       http://www.springframework.org/schema/user https://www.springframework.org/schema/spring-user.xsd"
+>
+
+	<bean id="apple" name="apple2" class="org.springframework.beans.mytest.Apple">
+		<constructor-arg name="name" value="newid"/>
+	</bean>
+	<alias name="apple2" alias="appleAlias"/>
+	<user:user id="testBean" name="testNameSpace"/>
+
+</beans>
