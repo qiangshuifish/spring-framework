@@ -161,6 +161,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 			XmlReaderContext readerContext, Element root, @Nullable BeanDefinitionParserDelegate parentDelegate) {
 
 		BeanDefinitionParserDelegate delegate = new BeanDefinitionParserDelegate(readerContext);
+		// 配置所有标签通用的默认属性 BeanDefinitionParserDelegate.populateDefaults
 		delegate.initDefaults(root, parentDelegate);
 		return delegate;
 	}
