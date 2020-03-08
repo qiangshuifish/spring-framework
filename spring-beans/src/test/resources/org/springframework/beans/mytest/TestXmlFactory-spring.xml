@@ -11,6 +11,9 @@
 		<constructor-arg name="name" value="newid"/>
 	</bean>
 	<alias name="apple2" alias="appleAlias"/>
-	<user:user id="testBean" name="testNameSpace"/>
+	<user:user id="testNameSpace" name="testNameSpace"/>
+
+
+	<bean id="factoryApple" class="org.springframework.beans.mytest.AppleFactoryBean" />
 
 </beans>

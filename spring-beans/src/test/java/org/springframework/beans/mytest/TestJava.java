@@ -2,6 +2,9 @@ package org.springframework.beans.mytest;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p></p>
  *
@@ -21,5 +24,12 @@ public class TestJava {
 	public void test() {
 		System.out.println("========= test =========");
 
+		System.out.println("&factoryApple".substring("&".length()));
+
+		Map<String,String> map = new HashMap<>();
+		map.put("key1","value1");
+
+		map.computeIfAbsent("key2",key -> map.put(key,"value2"));
+		System.out.println(map.get("key2"));
 	}
 }

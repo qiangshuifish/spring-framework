@@ -39,7 +39,9 @@ public class TestXmlFactory {
 		reader.loadBeanDefinitions(ROOT_CONTEXT);
 
 		((Apple)factory.getBean("apple")).print();
-		((Apple)factory.getBean("testBean")).print();
+		((Apple)factory.getBean("testNameSpace")).print();
+		((Apple)factory.getBean("factoryApple")).print();
+		System.out.println(factory.getBean("&&factoryApple"));
 	}
 
 	@Test
